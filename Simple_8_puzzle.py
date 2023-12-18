@@ -1,17 +1,52 @@
-import heapq
+from collections import deque
+from heapq import heappop, heappush
+from typing import List
+
 
 class PuzzleNode:
-    def __init__(self, state, parent=None, heuristic=None, cost=0):
+    def __init__(self, state=None, parent=None, heuristic=None, cost=0):
+        """
+        Initialize a PuzzleNode object.
+
+        Args:
+        - state: the state of the puzzle
+        - parent: the parent node of the current node (default: None)
+        - heuristic: the heuristic value of the node (default: None)
+        - cost: the cost of reaching the current node (default: 0)
+        """
         self.state = state
         self.parent = parent
         self.heuristic = heuristic
         self.cost = cost
+        self.total_cost = self.cost + self.heuristic
 
     def __lt__(self, other):
-        return (self.cost + self.heuristic) < (other.cost + other.heuristic)
+        """
+        Compare two PuzzleNode objects based on their total cost.
+
+        Args:
+        - other: the other PuzzleNode object to compare with
+
+        Returns:
+        - True if the total cost of self is less than the total cost of other, False otherwise.
+        """
+        if self.total_cost == other.total_cost:
+            return self.heuristic < other.heuristic
+        return self.total_cost < other.total_cost
 
 def manhattan_distance(state, goal):
+    """
+    The manhattan_distance function calculates the Manhattan distance between a given state and a goal state.
+
+    Args:
+    - state: the state of the puzzle
+    - goal: the goal state to reach
+
+    Returns:
+    -  an integer representing the Manhattan distance between the current state and the goal state.
+    """
     distance = 0
+    # Flatten the goal state into a 1-dimensional list called goal_flat.
     goal_flat = [item for sublist in goal for item in sublist]
 
     for i in range(len(state)):
@@ -23,6 +58,16 @@ def manhattan_distance(state, goal):
 
 
 def misplaced_tiles(state, goal):
+    """
+        The misplaced_tiles function calculates the number of tiles that are in the wrong position between a given state and a goal state.
+        
+        Args:
+        - state: the state of the puzzle
+        - goal: the goal state to reach
+
+        Returns:
+        -  The number of tiles that are in the wrong position between the state and goal matrices.
+    """
     count = 0
     for i in range(len(state)):
         for j in range(len(state[i])):
@@ -31,33 +76,56 @@ def misplaced_tiles(state, goal):
     return count
 
 def a_star(start, goal, heuristic_func):
+    """
+        This code provides an implementation of the A* algorithm to solve a puzzle.
+        The a_star function takes a start state, a goal state, and a heuristic function as inputs,
+        and returns the optimal path from the start state to the goal state.
+
+        Args:
+        - start: the start state of the puzzle
+        - goal: the goal state of the puzzle
+        - heuristic_func: a function that calculates the heuristic value for a given state and the goal state
+
+        Returns:
+        -  The number of tiles that are in the wrong position between the state and goal matrices.
+    """
     open_set = [PuzzleNode(start, None, heuristic_func(start, goal))]
     closed_set = set()
 
     while open_set:
-        current_node = heapq.heappop(open_set)
+        current_node = heappop(open_set)
 
         if current_node.state == goal:
-            path = []
+            path = deque()
             while current_node:
-                path.insert(0, current_node.state)
+                path.appendleft(current_node.state)
                 current_node = current_node.parent
             return path
 
-        closed_set.add(tuple(map(tuple, current_node.state)))  # Fix here
+        closed_set.add(tuple(map(tuple, current_node.state)))
 
         for neighbor_state in get_neighbors(current_node.state):
-            if tuple(map(tuple, neighbor_state)) not in closed_set:  # Fix here
+            if tuple(map(tuple, neighbor_state)) not in closed_set:
                 neighbor_node = PuzzleNode(neighbor_state, current_node, heuristic_func(neighbor_state, goal), current_node.cost + 1)
-                heapq.heappush(open_set, neighbor_node)
+                heappush(open_set, neighbor_node)
 
-    return None  # No solution found
+    return None
 
 
-def get_neighbors(state):
-    neighbors = []
+def get_neighbors(state: List[List[int]]) -> deque:
+    """
+    Returns a deque of neighboring states of the given state.
+    
+    Args:
+        state (list): The current state of the puzzle.
+        
+    Returns:
+        deque: A deque of neighboring states.
+    """
+    neighbors = deque()
     zero_row, zero_col = find_zero_position(state)
 
+    #            right     left    down      up
     for move in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
         new_row, new_col = zero_row + move[0], zero_col + move[1]
         if 0 <= new_row < len(state) and 0 <= new_col < len(state[0]):
@@ -68,6 +136,17 @@ def get_neighbors(state):
     return neighbors
 
 def find_zero_position(state):
+    """
+        The find_zero_position function takes a 2D list called state as input and returns the row 
+        and column indices of the element with value 0 in the list.
+        
+        Args:
+        - state (2D list): The input list containing elements.
+
+        Returns:
+        -  zero_row: The row index of the element with value 0 in the input list.
+        -  zero_col: The column index of the element with value 0 in the input list.
+    """
     for i in range(len(state)):
         for j in range(len(state[i])):
             if state[i][j] == 0:
@@ -101,6 +180,3 @@ for state in path_manhattan:
 print("\nA* path using Misplaced Tiles:")
 for state in path_misplaced:
     print_puzzle(state)
-
-
-
