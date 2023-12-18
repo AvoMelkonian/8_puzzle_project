@@ -1,5 +1,5 @@
 from collections import deque
-from heapq import heappop, heappush
+from queue import PriorityQueue
 from typing import List
 
 
@@ -89,27 +89,32 @@ def a_star(start, goal, heuristic_func):
         Returns:
         -  The number of tiles that are in the wrong position between the state and goal matrices.
     """
-    open_set = [PuzzleNode(start, None, heuristic_func(start, goal))]
+    open_set = PriorityQueue()
+    open_set.put(PuzzleNode(start, None, heuristic_func(start, goal)))
     closed_set = set()
+    expanded_nodes = 0
 
-    while open_set:
-        current_node = heappop(open_set)
+    while not open_set.empty():
+        current_node = open_set.get()
+        expanded_nodes += 1
 
         if current_node.state == goal:
             path = deque()
             while current_node:
                 path.appendleft(current_node.state)
                 current_node = current_node.parent
-            return path
+            total_moves = len(path) - 1  # Subtract 1 to get the number of moves excluding the initial state
+            return path, total_moves, expanded_nodes
 
         closed_set.add(tuple(map(tuple, current_node.state)))
 
         for neighbor_state in get_neighbors(current_node.state):
             if tuple(map(tuple, neighbor_state)) not in closed_set:
-                neighbor_node = PuzzleNode(neighbor_state, current_node, heuristic_func(neighbor_state, goal), current_node.cost + 1)
-                heappush(open_set, neighbor_node)
+                neighbor_node = PuzzleNode(neighbor_state, current_node, heuristic_func(neighbor_state, goal),
+                                           current_node.cost + 1)
+                open_set.put(neighbor_node)
 
-    return None
+    return None, 0, expanded_nodes
 
 
 def get_neighbors(state: List[List[int]]) -> deque:
@@ -170,13 +175,27 @@ goal_state = [
     [7, 8, 0]
 ]
 
-path_manhattan = a_star(start_state, goal_state, manhattan_distance)
-path_misplaced = a_star(start_state, goal_state, misplaced_tiles)
+path_manhattan, moves_manhattan, expanded_manhattan = a_star(start_state, goal_state, manhattan_distance)
+
+print("Initial State:")
+print_puzzle(start_state)
+
+print("\nGoal State:")
+print_puzzle(goal_state)
 
 print("A* path using Manhattan Distance:")
-for state in path_manhattan:
+print("Moves to solve: ")
+for move_num, state in enumerate(path_manhattan):
+    print(f"Move {move_num}")
     print_puzzle(state)
+print(f"Moves to solve using Manhattan Distance heuristic: {moves_manhattan}")
+print(f"Expanded Nodes to solve using Manhattan Distance heuristic: {expanded_manhattan}")
 
+# A* path using Misplaced Tiles
+path_misplaced, moves_misplaced, expanded_misplaced = a_star(start_state, goal_state, misplaced_tiles)
 print("\nA* path using Misplaced Tiles:")
-for state in path_misplaced:
+for move_num, state in enumerate(path_misplaced):
+    print(f"Move {move_num}")
     print_puzzle(state)
+print(f"Moves to solve using missing tiles heuristic: {moves_misplaced}")
+print(f"Expanded Nodes to solve using missing tiles heuristic: {expanded_misplaced}")
