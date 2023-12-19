@@ -56,6 +56,6 @@ if is_solvable(start_state):
     print_moves("Manhattan Distance", path_manhattan, start_state, moves_manhattan, expanded_manhattan)
 
     path_misplaced, moves_misplaced, expanded_misplaced = a_star(start_state, goal_state, misplaced_tiles)
-    print_moves("Manhattan Distance", path_misplaced, start_state, moves_misplaced, expanded_misplaced)
+    print_moves("Misplaced Tiles", path_misplaced, start_state, moves_misplaced, expanded_misplaced)
 else:
     print("Puzzle is not solvable.")

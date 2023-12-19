@@ -274,7 +274,7 @@ def print_message(heuristic: str, moves: int, expanded: int):
     - expanded (int): The number of nodes expanded during the problem-solving process.
     """
     print(f"Moves to solve using {heuristic} heuristic: {moves}")
-    print(f"Expanded Nodes to solve using Manhattan Distance heuristic: {expanded}")
+    print(f"Expanded Nodes to solve using {heuristic} heuristic: {expanded}")
 
 
 # Example usage:
