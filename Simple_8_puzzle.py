@@ -1,5 +1,5 @@
 from collections import deque
-from queue import PriorityQueue
+from heapq import heappop, heappush
 from typing import List
 
 
@@ -34,6 +34,93 @@ class PuzzleNode:
             return self.heuristic < other.heuristic
         return self.total_cost < other.total_cost
 
+
+class FenwickTree:
+    """A Fenwick Tree implementation."""
+
+    def __init__(self, size):
+        """Initialize the Fenwick Tree.
+
+        Args:
+            size (int): The size of the Fenwick Tree.
+        """
+        self.size = size
+        self.tree = [0] * (size + 1)
+
+    def update(self, index, value):
+        """Update the Fenwick Tree.
+
+        Args:
+            index (int): The index to update.
+            value (int): The value to add to the index.
+        """
+        while index <= self.size:
+            self.tree[index] += value
+            index += index & -index
+
+    def query(self, index):
+        """Query the Fenwick Tree.
+
+        Args:
+            index (int): The index to query.
+
+        Returns:
+            int: The sum of values from index 1 to the given index.
+        """
+        result = 0
+        while index > 0:
+            result += self.tree[index]
+            index -= index & -index
+        return result
+
+
+def count_inversions(state):
+    """
+    The count_inversions function calculates the number of inversions in a
+    given state by using a Fenwick Tree data structure.
+
+    Args:
+    - state (list of lists): The input state represents a puzzle board,
+    where each sublist represents a row and each element represents a number in the puzzle.
+    The number 0 represents the empty space.
+
+    Returns:
+    - inversions (int): The number of inversions in the given state.
+    """
+    flat_state = [item for sublist in state for item in sublist if item != 0]
+    size = max(flat_state)
+    fenwick_tree = FenwickTree(size)
+    inversions = 0
+
+    for num in reversed(flat_state):
+        inversions += fenwick_tree.query(num - 1)
+        fenwick_tree.update(num, 1)
+
+    return inversions
+
+
+def is_solvable(state):
+    """
+    The is_solvable function determines whether a given puzzle state is solvable by
+    counting the number of inversions in the state and checking if it meets certain conditions.
+
+    Args:
+    - state (list of lists): The input state represents a puzzle board,
+    where each sublist represents a row and each element represents a number in the puzzle.
+    The number 0 represents the empty space.
+
+    Returns:
+    -  solvable (bool): True if the puzzle state is solvable, False otherwise.
+    """
+    inversions = count_inversions(state)
+    empty_row = sum(1 for row in state if 0 in row)
+
+    if len(state) % 2 == 1:  # Odd-sized puzzle
+        return inversions % 2 == 0
+    else:  # Even-sized puzzle
+        return (inversions + empty_row) % 2 == 1
+
+
 def manhattan_distance(state, goal):
     """
     The manhattan_distance function calculates the Manhattan distance between a given state and a goal state.
@@ -59,14 +146,15 @@ def manhattan_distance(state, goal):
 
 def misplaced_tiles(state, goal):
     """
-        The misplaced_tiles function calculates the number of tiles that are in the wrong position between a given state and a goal state.
-        
-        Args:
-        - state: the state of the puzzle
-        - goal: the goal state to reach
+    The misplaced_tiles function calculates the number of tiles that
+     are in the wrong position between a given state and a goal state.
 
-        Returns:
-        -  The number of tiles that are in the wrong position between the state and goal matrices.
+    Args:
+    - state: the state of the puzzle
+    - goal: the goal state to reach
+
+    Returns:
+    -  The number of tiles that are in the wrong position between the state and goal matrices.
     """
     count = 0
     for i in range(len(state)):
@@ -75,27 +163,28 @@ def misplaced_tiles(state, goal):
                 count += 1
     return count
 
+
 def a_star(start, goal, heuristic_func):
     """
-        This code provides an implementation of the A* algorithm to solve a puzzle.
-        The a_star function takes a start state, a goal state, and a heuristic function as inputs,
-        and returns the optimal path from the start state to the goal state.
+    This code provides an implementation of the A* algorithm to solve a puzzle.
+    The a_star function takes a start state, a goal state, and a heuristic function as inputs,
+    and returns the optimal path from the start state to the goal state.
 
-        Args:
-        - start: the start state of the puzzle
-        - goal: the goal state of the puzzle
-        - heuristic_func: a function that calculates the heuristic value for a given state and the goal state
+    Args:
+    - start: the start state of the puzzle
+    - goal: the goal state of the puzzle
+    - heuristic_func: a function that calculates the heuristic value for a given state and the goal state
 
-        Returns:
-        -  The number of tiles that are in the wrong position between the state and goal matrices.
+    Returns:
+    -  The number of tiles that are in the wrong position between the state and goal matrices.
     """
-    open_set = PriorityQueue()
-    open_set.put(PuzzleNode(start, None, heuristic_func(start, goal)))
+    open_set = []
+    heappush(open_set, (heuristic_func(start, goal), PuzzleNode(start, None, heuristic_func(start, goal))))
     closed_set = set()
     expanded_nodes = 0
 
-    while not open_set.empty():
-        current_node = open_set.get()
+    while open_set:
+        current_node = heappop(open_set)[1]
         expanded_nodes += 1
 
         if current_node.state == goal:
@@ -112,7 +201,7 @@ def a_star(start, goal, heuristic_func):
             if tuple(map(tuple, neighbor_state)) not in closed_set:
                 neighbor_node = PuzzleNode(neighbor_state, current_node, heuristic_func(neighbor_state, goal),
                                            current_node.cost + 1)
-                open_set.put(neighbor_node)
+                heappush(open_set, (neighbor_node.heuristic + neighbor_node.cost, neighbor_node))
 
     return None, 0, expanded_nodes
 
@@ -135,38 +224,64 @@ def get_neighbors(state: List[List[int]]) -> deque:
         new_row, new_col = zero_row + move[0], zero_col + move[1]
         if 0 <= new_row < len(state) and 0 <= new_col < len(state[0]):
             new_state = [row[:] for row in state]
-            new_state[zero_row][zero_col], new_state[new_row][new_col] = new_state[new_row][new_col], new_state[zero_row][zero_col]
+            new_state[zero_row][zero_col], new_state[new_row][new_col] = \
+                new_state[new_row][new_col], new_state[zero_row][zero_col]
             neighbors.append(new_state)
 
     return neighbors
 
+
 def find_zero_position(state):
     """
-        The find_zero_position function takes a 2D list called state as input and returns the row 
-        and column indices of the element with value 0 in the list.
-        
-        Args:
-        - state (2D list): The input list containing elements.
+    Takes a 2D list called state as input and returns the row
+    and column indices of the element with value 0 in the list.
 
-        Returns:
-        -  zero_row: The row index of the element with value 0 in the input list.
-        -  zero_col: The column index of the element with value 0 in the input list.
+    Args:
+    - state (2D list): The input list containing elements.
+
+    Returns:
+    -  zero_row: The row index of the element with value 0 in the input list.
+    -  zero_col: The column index of the element with value 0 in the input list.
     """
     for i in range(len(state)):
         for j in range(len(state[i])):
             if state[i][j] == 0:
                 return i, j
 
+
 def print_puzzle(state):
+    """
+    The print_puzzle function takes a 2D list representing a
+    puzzle state as input and prints it in a readable format.
+
+    Args:
+    - state: a 2D list representing the puzzle state. Each element in the list represents a tile in the puzzle,
+    with 0 representing the empty space.
+    """
     for row in state:
-        print(" ".join(map(lambda x: str(x) if x != 0 else ' ', row)))
+        print(" ".join(str(x) if x != 0 else ' ' for x in row), end="\n")
     print()
+
+
+def print_message(heuristic: str, moves: int, expanded: int):
+    """
+    The print_message function is used to print the number of moves and the number of
+    expanded nodes to solve a problem using a specific heuristic.
+
+    Args:
+    - heuristic (str): The name of the heuristic used to solve the problem.
+    - moves (int): The number of moves required to solve the problem.
+    - expanded (int): The number of nodes expanded during the problem-solving process.
+    """
+    print(f"Moves to solve using {heuristic} heuristic: {moves}")
+    print(f"Expanded Nodes to solve using Manhattan Distance heuristic: {expanded}")
+
 
 # Example usage:
 start_state = [
-    [1, 2, 3],
-    [5, 6, 0],
-    [7, 8, 4]
+    [5, 2, 8],
+    [4, 1, 7],
+    [0, 3, 6]
 ]
 
 goal_state = [
@@ -176,26 +291,16 @@ goal_state = [
 ]
 
 path_manhattan, moves_manhattan, expanded_manhattan = a_star(start_state, goal_state, manhattan_distance)
-
-print("Initial State:")
-print_puzzle(start_state)
-
-print("\nGoal State:")
-print_puzzle(goal_state)
-
-print("A* path using Manhattan Distance:")
-print("Moves to solve: ")
-for move_num, state in enumerate(path_manhattan):
-    print(f"Move {move_num}")
-    print_puzzle(state)
-print(f"Moves to solve using Manhattan Distance heuristic: {moves_manhattan}")
-print(f"Expanded Nodes to solve using Manhattan Distance heuristic: {expanded_manhattan}")
-
-# A* path using Misplaced Tiles
 path_misplaced, moves_misplaced, expanded_misplaced = a_star(start_state, goal_state, misplaced_tiles)
-print("\nA* path using Misplaced Tiles:")
-for move_num, state in enumerate(path_misplaced):
-    print(f"Move {move_num}")
-    print_puzzle(state)
-print(f"Moves to solve using missing tiles heuristic: {moves_misplaced}")
-print(f"Expanded Nodes to solve using missing tiles heuristic: {expanded_misplaced}")
+
+if is_solvable(start_state):
+    print("Initial State:")
+    print_puzzle(start_state)
+
+    print("Goal State:")
+    print_puzzle(goal_state)
+
+    print_message("Manhattan Distance", moves_manhattan, expanded_manhattan)
+    print_message("Misplaced Tiles", moves_misplaced, expanded_misplaced)
+else:
+    print("Puzzle is not solvable.")
