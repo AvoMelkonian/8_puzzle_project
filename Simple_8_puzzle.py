@@ -276,6 +276,7 @@ def print_message(heuristic: str, moves: int, expanded: int):
     print(f"Moves to solve using {heuristic} heuristic: {moves}")
     print(f"Expanded Nodes to solve using {heuristic} heuristic: {expanded}")
 
+
 # Example usage:
 start_state = [
     [1, 2, 3],
