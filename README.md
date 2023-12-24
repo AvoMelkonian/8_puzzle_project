@@ -1,0 +1,22 @@
+# Project Overview
+
+## Introduction
+The project focuses on solving puzzles using the A* algorithm with different heuristic functions. The puzzles are represented as 2D matrices, where each element corresponds to a tile in the puzzle, with 0 indicating an empty space.
+
+## Components
+
+### Puzzle Solver
+The puzzle solver is implemented using the A* algorithm, a popular search algorithm for finding the optimal path from a start state to a goal state. It incorporates two heuristic functions:
+
+1. **Manhattan Distance**: Calculates the Manhattan distance between the current state and the goal state. It is a measure of the total distance each tile is from its correct position.
+
+2. **Misplaced Tiles**: Counts the number of tiles that are in the wrong position between the current state and the goal state.
+
+### Fenwick Tree
+A Fenwick Tree is utilized to efficiently count inversions in the initial state of the puzzle. The count of inversions is crucial for determining the solvability of the puzzle.
+
+## Usage
+The project provides a modular structure that allows users to test the A* algorithm with different instances of puzzles. Users can input random instances, and the program will output information such as the optimal path, number of moves, expanded nodes, and effective branching factor for both heuristic functions.
+
+## Conclusion
+The project provides a comprehensive solution for solving puzzles using the A* algorithm and offers insights into the efficiency of different heuristic functions. It can be further expanded and customized for specific puzzle types and heuristic strategies.
