@@ -40,9 +40,9 @@ def print_moves(heuristic, path, start_state, moves, expanded):
 
 # Example usage:
 start_state = [
-    [5, 2, 8],
-    [4, 1, 7],
-    [0, 3, 6]
+    [1, 2, 3],
+    [5, 6, 0],
+    [7, 8, 4]
 ]
 
 goal_state = [

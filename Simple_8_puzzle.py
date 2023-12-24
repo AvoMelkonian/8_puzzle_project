@@ -279,9 +279,9 @@ def print_message(heuristic: str, moves: int, expanded: int):
 
 # Example usage:
 start_state = [
-    [5, 2, 8],
-    [4, 1, 7],
-    [0, 3, 6]
+    [1, 2, 3],
+    [5, 6, 0],
+    [7, 8, 4]
 ]
 
 goal_state = [
