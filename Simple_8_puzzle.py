@@ -276,7 +276,7 @@ def print_message(heuristic: str, moves: int, expanded: int):
     print(f"Moves to solve using {heuristic} heuristic: {moves}")
     print(f"Expanded Nodes to solve using {heuristic} heuristic: {expanded}")
 
-
+'''
 # Example usage:
 start_state = [
     [1, 2, 3],
@@ -293,6 +293,9 @@ goal_state = [
 path_manhattan, moves_manhattan, expanded_manhattan = a_star(start_state, goal_state, manhattan_distance)
 path_misplaced, moves_misplaced, expanded_misplaced = a_star(start_state, goal_state, misplaced_tiles)
 
+ebf_manhattan = calculate_effective_branching_factor(expanded_manhattan, depth_manhattan)
+ebf_misplaced = calculate_effective_branching_factor(expanded_misplaced, depth_misplaced)
+
 if is_solvable(start_state):
     print("Initial State:")
     print_puzzle(start_state)
@@ -304,3 +307,4 @@ if is_solvable(start_state):
     print_message("Misplaced Tiles", moves_misplaced, expanded_misplaced)
 else:
     print("Puzzle is not solvable.")
+'''
