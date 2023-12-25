@@ -263,7 +263,7 @@ def print_puzzle(state):
     print()
 
 
-def print_message(heuristic: str, moves: int, expanded: int):
+def print_message(heuristic, moves, expanded):
     """
     The print_message function is used to print the number of moves and the number of
     expanded nodes to solve a problem using a specific heuristic.
