@@ -286,6 +286,12 @@ def print_simple_8_puzzle():
     print("Enter the initial state of the puzzle:")
     start_state = []
     for _ in range(3):
+        """
+        Type the input like this :
+        1 2 3
+        5 6 0
+        7 8 4
+        """
         row = list(map(int, input().split()))
         start_state.append(row)
 
