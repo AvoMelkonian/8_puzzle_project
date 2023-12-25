@@ -276,31 +276,32 @@ def print_message(heuristic: str, moves: int, expanded: int):
     print(f"Moves to solve using {heuristic} heuristic: {moves}")
     print(f"Expanded Nodes to solve using {heuristic} heuristic: {expanded}")
 
-
-# Example usage:
-start_state = [
-    [1, 2, 3],
-    [5, 6, 0],
-    [7, 8, 4]
-]
-
 goal_state = [
     [1, 2, 3],
     [4, 5, 6],
     [7, 8, 0]
 ]
 
-path_manhattan, moves_manhattan, expanded_manhattan = a_star(start_state, goal_state, manhattan_distance)
-path_misplaced, moves_misplaced, expanded_misplaced = a_star(start_state, goal_state, misplaced_tiles)
+def print_simple_8_puzzle():
+    print("Enter the initial state of the puzzle:")
+    start_state = []
+    for _ in range(3):
+        row = list(map(int, input().split()))
+        start_state.append(row)
 
-if is_solvable(start_state):
-    print("Initial State:")
-    print_puzzle(start_state)
+    if is_solvable(start_state):
+        path_manhattan, moves_manhattan, expanded_manhattan = a_star(start_state, goal_state, manhattan_distance)
+        path_misplaced, moves_misplaced, expanded_misplaced = a_star(start_state, goal_state, misplaced_tiles)
 
-    print("Goal State:")
-    print_puzzle(goal_state)
+        print("\nInitial State:")
+        print_puzzle(start_state)
 
-    print_message("Manhattan Distance", moves_manhattan, expanded_manhattan)
-    print_message("Misplaced Tiles", moves_misplaced, expanded_misplaced)
-else:
-    print("Puzzle is not solvable.")
+        print("\nGoal State:")
+        print_puzzle(goal_state)
+
+        print_message("Manhattan Distance", moves_manhattan, expanded_manhattan)
+        print_message("Misplaced Tiles", moves_misplaced, expanded_misplaced)
+    else:
+        print("Puzzle is not solvable.")
+
+print_simple_8_puzzle()

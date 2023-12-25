@@ -1,6 +1,6 @@
 import math
 from random import shuffle
-from Simple_8_puzzle import is_solvable, a_star, manhattan_distance, misplaced_tiles
+from simple_8_puzzle import is_solvable, a_star, manhattan_distance, misplaced_tiles
 
 goal_state = [
     [1, 2, 3],
@@ -52,18 +52,20 @@ def calculate_effective_branching_factor(expanded_nodes, depth):
         return 0  # Avoid division by zero
     return math.pow(expanded_nodes, 1 / depth)
 
+def print_compare_8_puzzle_heuristics():
+    random_instances = generate_100_random_instances()
+    print(" d\t\tEBF Misplaced Tiles\t\tEBF Manhattan Distance")
+    for idx, instance in enumerate(random_instances, start=1):
+        path_manhattan, moves_manhattan, expanded_manhattan = a_star(instance, goal_state, manhattan_distance)
+        path_misplaced, moves_misplaced, expanded_misplaced = a_star(instance, goal_state, misplaced_tiles)
 
-random_instances = generate_100_random_instances()
-print(" d\t\tEBF Misplaced Tiles\t\tEBF Manhattan Distance")
-for idx, instance in enumerate(random_instances, start=1):
-    path_manhattan, moves_manhattan, expanded_manhattan = a_star(instance, goal_state, manhattan_distance)
-    path_misplaced, moves_misplaced, expanded_misplaced = a_star(instance, goal_state, misplaced_tiles)
+        depth_manhattan = moves_manhattan
+        depth_misplaced = moves_misplaced
 
-    depth_manhattan = moves_manhattan
-    depth_misplaced = moves_misplaced
+        ebf_manhattan = calculate_effective_branching_factor(expanded_manhattan, depth_manhattan)
+        ebf_misplaced = calculate_effective_branching_factor(expanded_misplaced, depth_misplaced)
 
-    ebf_manhattan = calculate_effective_branching_factor(expanded_manhattan, depth_manhattan)
-    ebf_misplaced = calculate_effective_branching_factor(expanded_misplaced, depth_misplaced)
+        # Print the information in the desired format
+        print(f"{idx:2}\t\t\t{ebf_misplaced:.4f}\t\t\t\t\t{ebf_manhattan:.4f}")
 
-    # Print the information in the desired format
-    print(f"{idx:2}\t\t\t{ebf_misplaced:.4f}\t\t\t\t\t{ebf_manhattan:.4f}")
+print_compare_8_puzzle_heuristics()

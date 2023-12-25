@@ -1,4 +1,4 @@
-from Simple_8_puzzle import print_puzzle, a_star, manhattan_distance, misplaced_tiles, print_message, is_solvable
+from simple_8_puzzle import print_puzzle, a_star, manhattan_distance, misplaced_tiles, print_message, is_solvable
 
 
 def print_moves(heuristic, path, start_state, moves, expanded):
@@ -37,25 +37,26 @@ def print_moves(heuristic, path, start_state, moves, expanded):
 
     print_message(heuristic, moves, expanded)
 
-
-# Example usage:
-start_state = [
-    [1, 2, 3],
-    [5, 6, 0],
-    [7, 8, 4]
-]
-
 goal_state = [
     [1, 2, 3],
     [4, 5, 6],
     [7, 8, 0]
 ]
 
-if is_solvable(start_state):
-    path_manhattan, moves_manhattan, expanded_manhattan = a_star(start_state, goal_state, manhattan_distance)
-    print_moves("Manhattan Distance", path_manhattan, start_state, moves_manhattan, expanded_manhattan)
+def print_8_puzzle():
+    print("Enter the initial state of the puzzle:")
+    start_state = []
+    for _ in range(3):
+        row = list(map(int, input().split()))
+        start_state.append(row)
 
-    path_misplaced, moves_misplaced, expanded_misplaced = a_star(start_state, goal_state, misplaced_tiles)
-    print_moves("Misplaced Tiles", path_misplaced, start_state, moves_misplaced, expanded_misplaced)
-else:
-    print("Puzzle is not solvable.")
+    if is_solvable(start_state):
+        path_manhattan, moves_manhattan, expanded_manhattan = a_star(start_state, goal_state, manhattan_distance)
+        print_moves("Manhattan Distance", path_manhattan, start_state, moves_manhattan, expanded_manhattan)
+
+        path_misplaced, moves_misplaced, expanded_misplaced = a_star(start_state, goal_state, misplaced_tiles)
+        print_moves("Misplaced Tiles", path_misplaced, start_state, moves_misplaced, expanded_misplaced)
+    else:
+        print("Puzzle is not solvable.")
+
+print_8_puzzle()
