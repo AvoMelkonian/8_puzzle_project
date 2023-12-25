@@ -15,6 +15,14 @@ The puzzle solver is implemented using the A* algorithm, a popular search algori
 ### Fenwick Tree
 A Fenwick Tree is utilized to efficiently count inversions in the initial state of the puzzle. The count of inversions is crucial for determining the solvability of the puzzle.
 
+## Python Files
+### Simple_8_puzzle :
+This code implements the 8-puzzle problem with the 2 heuristics and output count of moves from initial state to the goal state and the number of generated nodes.
+### 8_puzzle :
+This is an enhanced code that shows all moves from initial state to the goal state.
+### Compare_8_puzzle_Heuristics :
+This code generates 100 random instances of the game and calculates for each heuristic the effective branching factor for each depth and heuristic
+
 ## Usage
 The project provides a modular structure that allows users to test the A* algorithm with different instances of puzzles. Users can input random instances, and the program will output information such as the optimal path, number of moves, expanded nodes, and effective branching factor for both heuristic functions.
 
