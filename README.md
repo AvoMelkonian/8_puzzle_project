@@ -28,3 +28,10 @@ The project provides a modular structure that allows users to test the A* algori
 
 ## Conclusion
 The project provides a comprehensive solution for solving puzzles using the A* algorithm and offers insights into the efficiency of different heuristic functions. It can be further expanded and customized for specific puzzle types and heuristic strategies.
+
+## People who worked on this project
+ghazal_150589 غزل وليد جبري
+avo_108634 افو ملكونيان
+yaman_155730 يمان شربجي
+
+## ITE_BAI501_S23_HW
